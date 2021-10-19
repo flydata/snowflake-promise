@@ -37,7 +37,7 @@ export class Statement {
         if (err) { reject(err); }
         if (this.logSql) { this.log(elapsed); }
         this.rows = rows;
-        resolve();
+        resolve(this);
       };
 
       startTime = Date.now();
