@@ -16,10 +16,11 @@
   "types": "build/src/index.d.ts",
   "scripts": {
     "prepare": "del-cli build && tsc",
-    "postinstall": "tsc --outDir ./build"
+    "postinstall": "tsc --outDir ./build",
+    "test": "tsc --outDir ./build && node test/wrapper.test.js"
   },
   "engines": {
-    "node": ">=10"
+    "node": ">=20"
   },
   "devDependencies": {
     "@types/node": "^10.17.55",
@@ -30,6 +31,6 @@
     "typescript": "^3.9.9"
   },
   "dependencies": {
-    "snowflake-sdk": "^1.6.3"
+    "snowflake-sdk": "^2.0.1"
   }
 }

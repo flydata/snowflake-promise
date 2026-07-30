@@ -34,7 +34,7 @@ export class Statement {
 
       this.executeOptions['complete'] = (err, stmt, rows) => {
         const elapsed = Date.now() - startTime;
-        if (err) { reject(err); }
+        if (err) { reject(err); return; }
         if (this.logSql) { this.log(elapsed); }
         this.rows = rows;
         resolve(this);
@@ -59,7 +59,7 @@ export class Statement {
 
   /**
    * Get the rows returned by the Statement.
-   * @throws if the Statement was not in streaming mode
+   * @throws if the Statement has not been executed
    */
   getRows() {
     if (!this.executePromise) { throw new StatementNotExecutedError(); }

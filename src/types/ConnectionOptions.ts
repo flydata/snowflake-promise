@@ -8,6 +8,12 @@ export interface ConnectionOptions {
    * https://docs.snowflake.com/en/user-guide/nodejs-driver-use.html#required-connection-options
    */
   account: string;
+  /**
+   * Full URL of the Snowflake host to connect to. Set this to override the default
+   * `<account>.snowflakecomputing.com` derivation, e.g. for accounts served from a
+   * different domain.
+   */
+  accessUrl?: string;
   /** Snowflake user login name to connect with. */
   username: string;
   /**
