@@ -28,9 +28,10 @@
     "np": "^6.5.0",
     "ts-node": "^9.1.1",
     "tslint": "^6.1.3",
-    "typescript": "^3.9.9"
+    "typescript": "^3.9.9",
+    "snowflake-sdk": "^2.0.1"
   },
-  "dependencies": {
+  "peerDependencies": {
     "snowflake-sdk": "^2.0.1"
   }
 }
