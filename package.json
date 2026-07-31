@@ -23,7 +23,7 @@
     "node": ">=20"
   },
   "devDependencies": {
-    "@types/node": "^10.17.55",
+    "@types/node": "^20.19.10",
     "del-cli": "^3.0.1",
     "np": "^6.5.0",
     "ts-node": "^9.1.1",

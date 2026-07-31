@@ -141,17 +141,20 @@ SDK.configure({ logLevel: 'ERROR' });
     assert.strictEqual(settled, 'rejected');
   });
 
-  await test('execute() rejects once on failure (no double-settle)', async () => {
-    const sf = new Snowflake({ ...BASE, retryTimeout: 1, sfRetryMaxLoginRetries: 1 });
-    const stmt = sf.createStatement({ sqlText: 'SELECT 1' });
-    let settles = 0;
-    await stmt.execute().then(
-      () => settles++,
-      () => settles++
+  await test('execute() does not run logSql on the error path', async () => {
+    // Regression test for the fall-through bug: execute()'s complete callback
+    // called reject(err) without returning, so it went on to run logSql against a
+    // statement that had failed. Counting promise settlements cannot detect this —
+    // a promise settles once by spec — so assert on the observable side effect.
+    let logged = 0;
+    const sf = new Snowflake(
+      { ...BASE, retryTimeout: 1, sfRetryMaxLoginRetries: 1 },
+      { logSql: () => logged++ }
     );
-    // give any stray second settlement a tick to land
+    const stmt = sf.createStatement({ sqlText: 'SELECT 1' });
+    await stmt.execute().catch(() => {});
     await new Promise((r) => setTimeout(r, 50));
-    assert.strictEqual(settles, 1);
+    assert.strictEqual(logged, 0, 'logSql must not run after reject()');
   });
 
   await test('execute() twice throws StatementAlreadyExecutedError', () => {
