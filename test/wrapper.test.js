@@ -11,7 +11,17 @@ const assert = require('assert');
 const crypto = require('crypto');
 const SDK = require('snowflake-sdk');
 const { Snowflake, Statement } = require('../build/src/index');
-const globalConfig = require('snowflake-sdk/lib/global_config');
+
+// Capture what the wrapper forwards to SDK.configure(). Asserting on the
+// pass-through keeps these tests to this package's actual contract; whether a
+// given key flips OCSP internally is the SDK's business, and reaching into
+// snowflake-sdk/lib/global_config to check it would couple us to its internals.
+let configureCalls = [];
+const realConfigure = SDK.configure;
+SDK.configure = function (options) {
+  configureCalls.push(options);
+  return realConfigure.call(this, options);
+};
 
 let passed = 0;
 let failed = 0;
@@ -73,20 +83,26 @@ SDK.configure({ logLevel: 'ERROR' });
     assert.ok(sf.id.length > 0);
   });
 
-  await test('disableOCSPChecks reaches the SDK and flips OCSP off', () => {
-    globalConfig.setDisableOCSPChecks(false);
+  await test('disableOCSPChecks is forwarded to SDK.configure', () => {
+    configureCalls = [];
     new Snowflake(BASE, {}, { disableOCSPChecks: true });
-    assert.strictEqual(globalConfig.isOCSPChecksDisabled(), true);
+    assert.deepStrictEqual(configureCalls, [{ disableOCSPChecks: true }]);
   });
 
-  await test('ocspFailOpen still reaches the SDK', () => {
-    globalConfig.setOcspFailOpen(false);
+  await test('ocspFailOpen is forwarded to SDK.configure', () => {
+    configureCalls = [];
     new Snowflake(BASE, {}, { ocspFailOpen: true });
-    assert.strictEqual(globalConfig.getOcspFailOpen(), true);
+    assert.deepStrictEqual(configureCalls, [{ ocspFailOpen: true }]);
   });
 
-  await test('boolean configureOptions warns and does NOT disable OCSP', () => {
-    globalConfig.setDisableOCSPChecks(false);
+  await test('no configureOptions means configure() is not called', () => {
+    configureCalls = [];
+    new Snowflake(BASE);
+    assert.deepStrictEqual(configureCalls, []);
+  });
+
+  await test('boolean configureOptions warns and forwards nothing', () => {
+    configureCalls = [];
     const warnings = [];
     const orig = console.warn;
     console.warn = (m) => warnings.push(m);
@@ -100,10 +116,10 @@ SDK.configure({ logLevel: 'ERROR' });
       /disableOCSPChecks/.test(warnings[0]),
       'warning should point at disableOCSPChecks'
     );
-    assert.strictEqual(
-      globalConfig.isOCSPChecksDisabled(),
-      false,
-      'boolean form must not silently disable OCSP'
+    assert.deepStrictEqual(
+      configureCalls,
+      [],
+      'boolean form must not silently configure anything'
     );
   });
 
