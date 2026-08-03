@@ -16,20 +16,22 @@
   "types": "build/src/index.d.ts",
   "scripts": {
     "prepare": "del-cli build && tsc",
-    "postinstall": "tsc --outDir ./build"
+    "postinstall": "tsc --outDir ./build",
+    "test": "tsc --outDir ./build && node test/wrapper.test.js"
   },
   "engines": {
-    "node": ">=10"
+    "node": ">=20"
   },
   "devDependencies": {
-    "@types/node": "^10.17.55",
+    "@types/node": "^20.19.10",
     "del-cli": "^3.0.1",
     "np": "^6.5.0",
     "ts-node": "^9.1.1",
     "tslint": "^6.1.3",
-    "typescript": "^3.9.9"
+    "typescript": "^3.9.9",
+    "snowflake-sdk": "^2.0.1"
   },
-  "dependencies": {
-    "snowflake-sdk": "^1.6.3"
+  "peerDependencies": {
+    "snowflake-sdk": "^2.0.1"
   }
 }

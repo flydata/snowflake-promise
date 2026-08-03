@@ -27,13 +27,14 @@ export class Snowflake {
     this.logSql = (loggingOptions && loggingOptions.logSql) || null;
 
     // For backward compatibility, configureOptions is allowed to be a boolean, but it’s
-    // ignored. The new default settings accomplish the same thing as the old
-    // `insecureConnect` boolean.
+    // ignored. Callers that relied on it to disable OCSP must now pass
+    // `{ disableOCSPChecks: true }` explicitly — snowflake-sdk 2.x no longer honours the
+    // old `insecureConnect` key, and silently ignores it rather than erroring.
 
     if (typeof configureOptions === 'boolean') {
       console.warn(
-        '[snowflake-promise] the insecureConnect boolean argument is deprecated; ' +
-          'please remove it or use the ocspFailOpen configure option'
+        '[snowflake-promise] the insecureConnect boolean argument is ignored; ' +
+          'pass { disableOCSPChecks: true } to actually disable OCSP checks'
       );
     } else if (typeof configureOptions === 'object') {
       SDK.configure(configureOptions);

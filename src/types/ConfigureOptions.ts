@@ -1,14 +1,12 @@
-export interface ConfigureOptions {
-  /**
-   * If true, don’t fail the connection if OCSP validation doesn’t provide a valid
-   * response. (Default: true)
-   */
-  ocspFailOpen?: boolean;
+import * as SDK from 'snowflake-sdk';
 
-  /**
-   * If true, disable OCSP check at connection. See
-   * https://community.snowflake.com/s/article/How-to-turn-off-OCSP-checking-in-Snowflake-client-drivers
-   * for additional details. (Default: false)
-   */
-  insecureConnect?: boolean;
-}
+/**
+ * Global configure() options, derived from snowflake-sdk's own typings rather
+ * than hand-maintained here.
+ *
+ * Hand-copying this interface is what let `insecureConnect` survive after the SDK
+ * renamed it to `disableOCSPChecks` in 2.0.0 — the copy kept advertising a key the
+ * SDK silently ignores, which left OCSP checks enabled with no error. Deriving
+ * means a future rename shows up as a compile error instead.
+ */
+export type ConfigureOptions = SDK.ConfigureOptions;
